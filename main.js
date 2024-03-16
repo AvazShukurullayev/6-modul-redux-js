@@ -1,40 +1,22 @@
-import {createStore} from "redux";
+import {bindActionCreators, createStore} from "redux";
+import * as actions from "./actions";
+import reducer from "./reducer";
 
-// Todo: shu reducer imza asosan toza(clear function) bolishi kere nimadurga qaram bolishi keremas.
-//  bu digani biza hoxlagan paytimizda hoxlagan file ga chiqazib yubora olishimiz kere.
-//  bu function tashqaridan qandaydur props mi function mi qabul qilishi keremas. har doim clear function bolishi kere.
-const initialState = {count: 0, firstName: "Samar", lastName: "Badriddinov"}
-const reducer = (state = initialState, action) => {
-    switch (action.type) {
-        case "INC":
-            return {...state, count: state.count + 1}
-        case "DECR":
-            return {...state, count: state.count - 1}
-        case "RND":
-            return {...state, count: action.payload}
-    }
-}
+console.log("actions", actions)
 
 const store = createStore(reducer)
+const {getState, dispatch, subscribe} = store
 const updateUI = () => {
-    document.querySelector("#counter").textContent = String(store.getState().count)
+    document.querySelector("#counter").textContent = String(getState().count)
 }
 
-store.subscribe(updateUI) // callback qilib berib qoyvommiz, stateimizni ozgarsa subscribe function ishga tushadi like componentDidUpdate
+subscribe(updateUI) // callback qilib berib qoyvommiz, stateimizni ozgarsa subscribe function ishga tushadi like componentDidUpdate
 
-// optimizing actions
-const inc = () => ({type: "INC"})
-const decr = () => ({type: "DECR"})
-const rnd = (value) => ({type: "RND", payload: value})
-document.querySelector("#inc").addEventListener("click", () => {
-    store.dispatch(inc())
-})
+const {inc, decr, rnd} = bindActionCreators(actions, dispatch) // return object that's why we do destruction
 
-document.querySelector("#decr").addEventListener("click", () => {
-    store.dispatch(decr())
-})
-
+document.querySelector("#inc").addEventListener("click", inc)
+document.querySelector("#decr").addEventListener("click", decr)
 document.querySelector("#rnd").addEventListener("click", () => {
-    const randomValue = Math.floor(Math.random() * 100000000000)
-    store.dispatch(rnd(randomValue))
+    const randomValue = Math.floor(Math.random() * 100)
+    rnd(randomValue)
 })
